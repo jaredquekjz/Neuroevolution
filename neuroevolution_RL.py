@@ -36,6 +36,7 @@ def run_agent(model, runs, env):
     scores = []
     sim_steps = 500
     SHOW_EVERY = 100
+    #env = gym.make("CartPole-v0")
     for _ in range(runs):
         observation = env.reset()
         score = 0
@@ -43,8 +44,8 @@ def run_agent(model, runs, env):
             action = np.argmax(model.predict(observation.reshape(1, 4)))
             observation, reward, done, _ = env.step(action)
 
-            if step % SHOW_EVERY == 0:
-                env.render()
+            # if step % SHOW_EVERY == 0:
+            # env.render()
             score += reward
             if done:
                 break
@@ -101,7 +102,7 @@ num_agents = 50
 agents = return_random_agents(num_agents)
 
 # How many top agents to consider as parents
-top_limit = 10
+top_limit = 5
 
 # run evolution until X generations
 generations = 5
