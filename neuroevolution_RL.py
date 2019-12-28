@@ -60,16 +60,19 @@ def return_random_agents(number):
     return agents
 
 
-def run_agent(model, runs):
-    env = gym.make("CartPole-v0")
+def run_agent(model, runs, env):
     scores = []
     sim_steps = 500
+    SHOW_EVERY = 100
     for _ in range(runs):
         observation = env.reset()
         score = 0
         for step in range(sim_steps):
             action = np.argmax(model.predict(observation.reshape(1, 4)))
             observation, reward, done, _ = env.step(action)
+
+            if step % SHOW_EVERY == 0:
+                env.render()
             score += reward
             if done:
                 break
@@ -78,10 +81,10 @@ def run_agent(model, runs):
     return np.mean(scores)
 
 
-def return_agent_stackscores(agents, runs):
+def return_agent_stackscores(agents, runs, env):
     stackscore = []
     for agent in agents:
-        stackscore.append(run_agent(agent, runs))
+        stackscore.append(run_agent(agent, runs, env))
     return stackscore
 
 
@@ -118,18 +121,20 @@ num_agents = 50
 agents = return_random_agents(num_agents)
 
 # How many top agents to consider as parents
-top_limit = 20
+top_limit = 10
 
 # run evolution until X generations
-generations = 10
+generations = 5
 
 elite_index = None
 
+env = gym.make("CartPole-v0")
 
 for generation in range(generations):
 
     # return rewards of agents
-    rewards = return_agent_stackscores(agents, 5)  # return average of 50 runs
+    rewards = return_agent_stackscores(
+        agents, 5, env)  # return average of 50 runs
 
     # sort by rewards
     # reverses and gives top values (argsort sorts by ascending by default) https://stackoverflow.com/questions/16486252/is-it-possible-to-use-argsort-in-descending-order
