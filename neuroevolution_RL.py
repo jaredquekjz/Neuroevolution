@@ -3,39 +3,7 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 
-
-def gather_data(env):
-    num_trials = 10000
-    min_score = 50
-    sim_steps = 500
-    trainingX, trainingY = [], []
-
-    scores = []
-    for _ in range(num_trials):
-        observation = env.reset()
-        score = 0
-        training_sampleX, training_sampleY = [], []
-        for step in range(sim_steps):
-            # action corresponds to the previous observation so record before step
-            action = np.random.randint(0, 2)
-            one_hot_action = np.zeros(2)
-            one_hot_action[action] = 1
-            training_sampleX.append(observation)
-            training_sampleY.append(one_hot_action)
-
-            observation, reward, done, _ = env.step(action)
-            score += reward
-            if done:
-                break
-        if score > min_score:
-            scores.append(score)
-            trainingX += training_sampleX
-            trainingY += training_sampleY
-
-    trainingX, trainingY = np.array(trainingX), np.array(trainingY)
-    print("Average scores: {}".format(np.mean(scores)))
-    print("Median scores: {}".format(np.median(scores)))
-    return trainingX, trainingY
+# create neural network agent
 
 
 def create_agent():
@@ -49,6 +17,8 @@ def create_agent():
         metrics=["accuracy"])
     return model
 
+# create multiple random nets
+
 
 def return_random_agents(number):
     agents = []
@@ -58,6 +28,8 @@ def return_random_agents(number):
         agents.append(agent)
 
     return agents
+
+# test agents
 
 
 def run_agent(model, runs, env):
@@ -80,12 +52,16 @@ def run_agent(model, runs, env):
     print(np.mean(scores))
     return np.mean(scores)
 
+# consolidate agent scores
+
 
 def return_agent_stackscores(agents, runs, env):
     stackscore = []
     for agent in agents:
         stackscore.append(run_agent(agent, runs, env))
     return stackscore
+
+# reproduction function
 
 
 def reproduce(agentX, agentY):
@@ -101,6 +77,8 @@ def reproduce(agentX, agentY):
 
     return child_agent
 
+# reproduce top agents
+
 
 def return_children(agents, sorted_parent_indexes):
 
@@ -115,6 +93,8 @@ def return_children(agents, sorted_parent_indexes):
             reproduce(agents[selectedX_agent_index], agents[selectedY_agent_index]))
 
     return children_agents
+
+# Main run
 
 
 num_agents = 50
